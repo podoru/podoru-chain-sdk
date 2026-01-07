@@ -1,5 +1,12 @@
 // API types
-export type { ApiResponse, SubmitTransactionResponse } from './api.js';
+export type {
+  ApiResponse,
+  SubmitTransactionResponse,
+  BalanceInfo,
+  TokenInfo,
+  GasConfig,
+  GasEstimate,
+} from './api.js';
 
 // Chain types
 export type { ChainInfo, BlockHeader, Block } from './chain.js';

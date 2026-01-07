@@ -55,6 +55,81 @@ export class TransactionBuilder {
   }
 
   /**
+   * Add a TRANSFER operation to send tokens to an address
+   * @param toAddress - The recipient address (0x-prefixed)
+   * @param amount - Amount in wei as string (for big numbers) or bigint
+   */
+  transfer(toAddress: string, amount: string | bigint): TransactionBuilder {
+    if (!isValidAddress(toAddress)) {
+      throw new ValidationError(`Invalid recipient address: ${toAddress}`);
+    }
+
+    // Convert amount to bytes (big-endian)
+    const amountBigInt = typeof amount === 'string' ? BigInt(amount) : amount;
+    if (amountBigInt <= 0n) {
+      throw new ValidationError('Transfer amount must be positive');
+    }
+
+    const amountBytes = this.bigIntToBytes(amountBigInt);
+    const encodedAmount = base64Encode(amountBytes);
+
+    // Balance key format: balance:<address>
+    const balanceKey = `balance:${toAddress.toLowerCase()}`;
+
+    this.operations.push({
+      type: 'TRANSFER',
+      key: balanceKey,
+      value: encodedAmount,
+    });
+    return this;
+  }
+
+  /**
+   * Add a MINT operation (authority-only)
+   * @param toAddress - The recipient address (0x-prefixed)
+   * @param amount - Amount in wei as string (for big numbers) or bigint
+   */
+  mint(toAddress: string, amount: string | bigint): TransactionBuilder {
+    if (!isValidAddress(toAddress)) {
+      throw new ValidationError(`Invalid recipient address: ${toAddress}`);
+    }
+
+    const amountBigInt = typeof amount === 'string' ? BigInt(amount) : amount;
+    if (amountBigInt <= 0n) {
+      throw new ValidationError('Mint amount must be positive');
+    }
+
+    const amountBytes = this.bigIntToBytes(amountBigInt);
+    const encodedAmount = base64Encode(amountBytes);
+
+    const balanceKey = `balance:${toAddress.toLowerCase()}`;
+
+    this.operations.push({
+      type: 'MINT',
+      key: balanceKey,
+      value: encodedAmount,
+    });
+    return this;
+  }
+
+  /**
+   * Convert bigint to big-endian byte array
+   */
+  private bigIntToBytes(value: bigint): Uint8Array {
+    if (value === 0n) {
+      return new Uint8Array([0]);
+    }
+
+    const hex = value.toString(16);
+    const paddedHex = hex.length % 2 === 0 ? hex : '0' + hex;
+    const bytes = new Uint8Array(paddedHex.length / 2);
+    for (let i = 0; i < paddedHex.length; i += 2) {
+      bytes[i / 2] = parseInt(paddedHex.substring(i, i + 2), 16);
+    }
+    return bytes;
+  }
+
+  /**
    * Add a raw operation
    */
   addOperation(op: Operation): TransactionBuilder {

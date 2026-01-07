@@ -1,6 +1,6 @@
 import type { ChainInfo, Block } from '../types/chain.js';
 import type { Transaction } from '../types/transaction.js';
-import type { SubmitTransactionResponse } from '../types/api.js';
+import type { SubmitTransactionResponse, BalanceInfo, TokenInfo, GasConfig, GasEstimate } from '../types/api.js';
 import type { StateValueResponse, PrefixQueryResult } from '../types/state.js';
 import type { NodeInfo, Peer, MempoolInfo, HealthResponse } from '../types/node.js';
 import { ApiError } from '../errors/index.js';
@@ -185,5 +185,42 @@ export class PodoruClient {
    */
   async getMempool(): Promise<MempoolInfo> {
     return this.fetch<MempoolInfo>('/api/v1/mempool');
+  }
+
+  // ===== Balance Endpoints =====
+
+  /**
+   * Get balance for an address
+   */
+  async getBalance(address: string): Promise<BalanceInfo> {
+    return this.fetch<BalanceInfo>(`/api/v1/balance/${address}`);
+  }
+
+  // ===== Token Endpoints =====
+
+  /**
+   * Get token information
+   */
+  async getTokenInfo(): Promise<TokenInfo> {
+    return this.fetch<TokenInfo>('/api/v1/token/info');
+  }
+
+  // ===== Gas Endpoints =====
+
+  /**
+   * Get gas configuration
+   */
+  async getGasConfig(): Promise<GasConfig> {
+    return this.fetch<GasConfig>('/api/v1/gas/config');
+  }
+
+  /**
+   * Estimate gas fee for a transaction of given size
+   */
+  async estimateGas(transactionSize: number): Promise<GasEstimate> {
+    return this.fetch<GasEstimate>('/api/v1/gas/estimate', {
+      method: 'POST',
+      body: JSON.stringify({ transaction_size: transactionSize }),
+    });
   }
 }

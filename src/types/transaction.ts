@@ -1,7 +1,7 @@
 /**
  * Operation type for key-value store
  */
-export type OperationType = 'SET' | 'DELETE';
+export type OperationType = 'SET' | 'DELETE' | 'MINT' | 'TRANSFER';
 
 /**
  * Single operation on the key-value store
