@@ -1,5 +1,5 @@
 {
-  "name": "@cds-id/podoru-sdk",
+  "name": "@cds.id/podoru-sdk",
   "version": "1.0.0",
   "private": false,
   "description": "TypeScript SDK for Podoru Chain",
